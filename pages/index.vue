@@ -7,7 +7,7 @@ import { defineComponent, reactive, ref } from "@nuxtjs/composition-api";
 export default defineComponent({
   name: "Home",
   setup() {
-    let socket = ref<WebSocket>();
+    const socket = ref<WebSocket>();
     const input = ref("");
     const data = reactive({
       message: "",
@@ -15,12 +15,12 @@ export default defineComponent({
       status: false,
     });
 
-    const wss = "wss://demo.piesocket.com/v3/channel_1?api_key=oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm&notify_self";
+    // https://www.piesocket.com/websocket-tester
+    const apiKey = "oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm"
+    const wss = `wss://demo.piesocket.com/v3/channel_1?api_key=${apiKey}&notify_self`;
 
     function connect() {
-      console.warn("Request Connect!");
       socket.value = new WebSocket(wss);
-      console.warn({ ...socket });
       socket.value.onopen = () => {
         data.status = true;
         data.logs.push({ e: "connected!", c: wss });
@@ -29,18 +29,15 @@ export default defineComponent({
             data.logs.push({ e: "received", c: response.data });
           };
       };
-      console.warn({ ...socket });
     }
 
     function disconnect() {
-      console.warn("Request Disconnect!");
       socket.value?.close();
       data.status = false;
       data.logs = [];
     }
 
     function sendMessage() {
-      console.warn("Send message");
       socket.value?.send(input.value);
       data.logs.push({ e: "send", c: input.value });
       input.value = "";
